@@ -44,7 +44,7 @@ Conversion of the OS sources to the tape-based CFS is, however, a tedious two-st
 * splitting the SD card image, using a hex editor, into smaller parts of size equal to MMAP volume of your build, containing an integer number of CFS blocks;
 * converting each part to a tape image with a single headerless block;
 * loading the blocks into the ZX Spectrum Collapse OS MMAP filesystem using the `BINLD` application (see below);
-(with a Spectrum emulator such as Fuse, the two previous steps can be shortcut by loading image parts into MMAP area directly using the "load binary data" option)
+(with a Spectrum emulator such as Fuse, the two previous steps can be shortcut by loading image parts into MMAP area directly using the `File/Load binary data` option)
 * saving them to tape from the MMAP using the `CFSSV` application (see below), as a chain of 256-byte headerless blocks.
 The resulting sequence of blocks is readable by the tape blkdev.
 To save some assembly time, it is advised to minimize the working tapes content: one tape per application, one tape for kernel sources of the currently processed build.
@@ -65,6 +65,19 @@ To load and run the kernel from tape, execute the following in 48K BASIC mode of
 
 You may adjust your screen colours using `INK/PAPER/BRIGHT/BORDER` and `BORDCR (23624)` variable prior to that. 
 An example of a loader package is shown as `Boot.tap` in this directory.  
+
+## Emulation
+
+The recipe has been tested to work on the emulated ZX Spectrum under Windows, using Fuse 1.1.1 binary build and the original Sinclair Research Ltd ROMs. The original 48K and 128K configurations both run the boot binary, starting from either 48K or 128K BASIC mode. The binary works with the Beta Disk/TR-DOS emulation turned either on or off. No other emulated clones were tested.
+
+To run the provided package or your converted boot tape, open the `Boot.tap` using the `Media/Tape/Open (F7)` command in Fuse and run the launching commands above. Depending on Fuse configuration, the binary file will be loaded instantly or in real time.
+
+Please take note of the following when using emulated tapes with Collapse OS under Fuse:
+* The `Use tape traps` option in `Options/General (F4)` menu has to be turned on when *saving* to an emulated tape. Before loading from the tape just created, always save the modified content to a new .tap file by `Media/Tape/Write (F6)` and re-open it by `Media/Tape/Open (F7)`
+* When learning the system with minor works, the `Use tape traps` option can be turned off when *loading* from the tape. The playback is started and stopped manually by `Media/Tape/Play (F8)` in this case. Do not rewind the tape unless prompted by the magenta border
+* When assembling from the tape with `zasm`, the `Use tape traps` option can be turned on for speed, as the tape is always rewound after loading a new data portion
+* The new content is written at the end of the .tap file and can not be erased or overwritten
+* The `CFSSV` and `CUTSV` utilities add a 2-second pause between the saved CFS blocks, which is required for `zasm` to load and process the blocks seamlessly, but not preserved in .tap files. It is not relevant to tape emulation, but if you plan to convert your .tap files for real hardware, the pauses have to be somehow restored.
 
 ## Usage
 
